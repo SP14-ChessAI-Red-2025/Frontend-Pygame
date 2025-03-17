@@ -35,10 +35,13 @@ def draw_pcs(screen, game_board):
             #
             pcCoords = (pc, row, column)
 
+            if pc == "":
+                continue
+
             #
-            if(pc != "" and pcCoords != SELECTED_PIECE):
+            if pcCoords != SELECTED_PIECE:
                 screen.blit(icons[pc], pygame.Rect(SQ_SIZE * column, SQ_SIZE * row, SQ_SIZE, SQ_SIZE))
-            elif(pcCoords == SELECTED_PIECE):
+            else:
                 screen.blit(icons[pc], pygame.Rect(pygame.mouse.get_pos()[0] - (SQ_SIZE / 2), pygame.mouse.get_pos()[1] - (SQ_SIZE / 2), SQ_SIZE, SQ_SIZE))
 
 #initializes application window/provides game loop
