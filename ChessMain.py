@@ -82,7 +82,14 @@ def main(game_board):
                 column = (int)(position[0] / SQ_SIZE)
                 row = (int)(position [1] / SQ_SIZE)
                 global SELECTED_PIECE
-                SELECTED_PIECE = (game_board[row][column], row, column)
+
+                if SELECTED_PIECE[0] != "":
+                    pc, selected_row, selected_column = SELECTED_PIECE
+                    game_board[row][column] = pc
+                    game_board[selected_row][selected_column] = ""
+                    SELECTED_PIECE = ("", 0, 0)
+                else:
+                    SELECTED_PIECE = (game_board[row][column], row, column)
 
         #draw board & pieces
         draw_board(screen)
