@@ -35,7 +35,7 @@ def icon_for_piece(piece_type, piece_player):
         return icons[6 + piece_type - 1]
 
 #draws pieces over game board
-def draw_pcs(screen, game_board):
+def draw_pcs(screen, game_board, valid_moves):
     for row in range(BOARD_SIZE):
         for column in range(BOARD_SIZE):
             pc = game_board[row][column]
@@ -43,6 +43,8 @@ def draw_pcs(screen, game_board):
             pcCoords = (pc, row, column)
 
             if pc.piece_type == 0:
+                if (row, column) in [(7 - move.target_position.rank, move.target_position.file) for move in valid_moves]:
+                    pygame.draw.circle(screen, pygame.Color("black"), center = (column * SQ_SIZE + SQ_SIZE / 2, row * SQ_SIZE + SQ_SIZE / 2), radius = SQ_SIZE / 2, width = 2)
                 continue
 
             icon = icon_for_piece(pc.piece_type, pc.piece_player)
@@ -84,6 +86,8 @@ def main():
     with chess.ChessEngine(argv[1]) as engine:
         board_state = engine.board_state
 
+        valid_moves = []
+
         #render/input loop
         while True:
             for event in pygame.event.get():
@@ -103,17 +107,18 @@ def main():
                     valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
                     print(f"valid moves: {len(valid_moves)}")
 
-                    #if SELECTED_PIECE[0] != "":
-                    #    pc, selected_row, selected_column = SELECTED_PIECE
-                    #    game_board[row][column] = pc
-                    #    game_board[selected_row][selected_column] = ""
-                    #    SELECTED_PIECE = ("", 0, 0)
-                    #else:
-                    #    SELECTED_PIECE = (game_board[row][column], row, column)
+                    if SELECTED_PIECE[0] != "":
+                        pc, selected_row, selected_column = SELECTED_PIECE
+                        #game_board[row][column] = pc
+                        #game_board[selected_row][selected_column] = ""
+                        SELECTED_PIECE = ("", 0, 0)
+                        valid_moves = []
+                    else:
+                        SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
 
             #draw board & pieces
             draw_board(screen)
-            draw_pcs(screen, board_state.pieces)
+            draw_pcs(screen, board_state.pieces, valid_moves)
 
             pygame.display.update()
 
