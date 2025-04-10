@@ -13,8 +13,8 @@ icons = []
 
 #loads images
 def load_images():
-    pcs = ["blk_pawn", "blk_knight", "blk_bishop", "blk_rook", "blk_queen", "blk_king",
-           "wht_pawn", "wht_knight", "wht_bishop", "wht_rook", "wht_queen", "wht_king"]
+    pcs = ["wht_pawn", "wht_knight", "wht_bishop", "wht_rook", "wht_queen", "wht_king",
+           "blk_pawn", "blk_knight", "blk_bishop", "blk_rook", "blk_queen", "blk_king"]
     for pc in pcs:
         icons.append(pygame.transform.scale(pygame.image.load("images/" + pc + ".png"), (SQ_SIZE, SQ_SIZE)))
 
@@ -38,21 +38,20 @@ def icon_for_piece(piece_type, piece_player):
 def draw_pcs(screen, game_board, valid_moves):
     for row in range(BOARD_SIZE):
         for column in range(BOARD_SIZE):
-            pc = game_board[row][column]
+            pc = game_board[7 - row][column]
             #
             pcCoords = (pc, row, column)
 
-            if pc.piece_type == 0:
-                if (row, column) in [(7 - move.target_position.rank, move.target_position.file) for move in valid_moves]:
-                    pygame.draw.circle(screen, pygame.Color("black"), center = (column * SQ_SIZE + SQ_SIZE / 2, row * SQ_SIZE + SQ_SIZE / 2), radius = SQ_SIZE / 2, width = 2)
-                continue
+            if (row, column) in [(7 - move.target_position.rank, move.target_position.file) for move in valid_moves]:
+                pygame.draw.circle(screen, pygame.Color("black"), center = (column * SQ_SIZE + SQ_SIZE / 2, row * SQ_SIZE + SQ_SIZE / 2), radius = SQ_SIZE / 2, width = 2)
 
-            icon = icon_for_piece(pc.piece_type, pc.piece_player)
+            if pc.piece_type != 0:
+                icon = icon_for_piece(pc.piece_type, pc.piece_player)
 
-            if pcCoords != SELECTED_PIECE:
-                screen.blit(icon, pygame.Rect(SQ_SIZE * column, SQ_SIZE * row, SQ_SIZE, SQ_SIZE))
-            else:
-                screen.blit(icon, pygame.Rect(pygame.mouse.get_pos()[0] - (SQ_SIZE / 2), pygame.mouse.get_pos()[1] - (SQ_SIZE / 2), SQ_SIZE, SQ_SIZE))
+                if pcCoords != SELECTED_PIECE:
+                    screen.blit(icon, pygame.Rect(SQ_SIZE * column, SQ_SIZE * row, SQ_SIZE, SQ_SIZE))
+                else:
+                    screen.blit(icon, pygame.Rect(pygame.mouse.get_pos()[0] - (SQ_SIZE / 2), pygame.mouse.get_pos()[1] - (SQ_SIZE / 2), SQ_SIZE, SQ_SIZE))
 
 def moves_for_position(valid_moves, rank, file):
     return [move for move in valid_moves if move.start_position.rank == rank and move.start_position.file == file and move.type != 5 and move.type != 6]
@@ -100,21 +99,37 @@ def main():
                     position = pygame.mouse.get_pos()
                     column = (int)(position[0] / SQ_SIZE)
                     row = (int)(position [1] / SQ_SIZE)
+
                     global SELECTED_PIECE
 
-                    print(f"row: {row}, column: {column}")
+                    print(f"clicked row: {row}, column: {column}")
 
-                    valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
-                    print(f"valid moves: {len(valid_moves)}")
-
+                    made_move = False
+ 
                     if SELECTED_PIECE[0] != "":
-                        pc, selected_row, selected_column = SELECTED_PIECE
-                        #game_board[row][column] = pc
-                        #game_board[selected_row][selected_column] = ""
-                        SELECTED_PIECE = ("", 0, 0)
-                        valid_moves = []
+                        if (SELECTED_PIECE[1], SELECTED_PIECE[2]) == (row, column):
+                            # Deselect the current piece if the player clicks it again
+                            SELECTED_PIECE = ("", 0, 0)
+                            valid_moves = []
+
+                        for move in valid_moves:
+                            if (row, column) == (7 - move.target_position.rank, move.target_position.file):
+                                print(f"applying move {move}")
+                                engine.apply_move(move)
+
+                                SELECTED_PIECE = ("", 0, 0)
+                                valid_moves = []
+
+                                made_move = True
+
+                                break
+
+                        if not made_move and SELECTED_PIECE != ("", 0, 0):
+                            SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
+                            valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
                     else:
                         SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
+                        valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)                    
 
             #draw board & pieces
             draw_board(screen)
