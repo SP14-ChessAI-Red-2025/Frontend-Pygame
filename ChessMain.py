@@ -34,6 +34,21 @@ def icon_for_piece(piece_type, piece_player):
     else:
         return icons[6 + piece_type - 1]
 
+# Given a chess move, return the square that must be clicked to apply the move
+# For most moves, this is just move.target_position, but castling needs special handling
+def target_for_move(move):
+    if move.type in [5, 6]:
+        raise Exception("Claiming a draw and resignation don't have target positions")
+    if move.type == 3:
+        if move.start_position.file == 0:
+            return (move.start_position.rank, 2)
+        else:
+            return (move.start_position.rank, 6)
+        return None
+        raise Exception("Not implemented yet")
+
+    return (move.target_position.rank, move.target_position.file)
+
 #draws pieces over game board
 def draw_pcs(screen, game_board, valid_moves):
     for row in range(BOARD_SIZE):
@@ -42,7 +57,7 @@ def draw_pcs(screen, game_board, valid_moves):
             #
             pcCoords = (pc, row, column)
 
-            if (row, column) in [(7 - move.target_position.rank, move.target_position.file) for move in valid_moves]:
+            if (7 - row, column) in [target_for_move(move) for move in valid_moves]:
                 pygame.draw.circle(screen, pygame.Color("black"), center = (column * SQ_SIZE + SQ_SIZE / 2, row * SQ_SIZE + SQ_SIZE / 2), radius = SQ_SIZE / 2, width = 2)
 
             if pc.piece_type != 0:
@@ -54,7 +69,18 @@ def draw_pcs(screen, game_board, valid_moves):
                     screen.blit(icon, pygame.Rect(pygame.mouse.get_pos()[0] - (SQ_SIZE / 2), pygame.mouse.get_pos()[1] - (SQ_SIZE / 2), SQ_SIZE, SQ_SIZE))
 
 def moves_for_position(valid_moves, rank, file):
-    return [move for move in valid_moves if move.start_position.rank == rank and move.start_position.file == file and move.type != 5 and move.type != 6]
+    # Don't include moves of type castle, claim_draw, or resign, as they interpret move.target_position differently
+    moves = [move for move in valid_moves if move.start_position.rank == rank and move.start_position.file == file and move.type not in [3, 5, 6]]
+    
+    # If the user clicks on the king, add any castling moves to the list
+    # This is mixing the UI with game logic a bit too much for my taste, but it works
+    if (rank == 0 or rank == 7) and file == 4:
+        castle_moves = [move for move in valid_moves if move.type == 3 and move.start_position.rank == rank]
+
+        moves += castle_moves
+        
+
+    return moves
 
 #initializes application window/provides game loop
 def main():
@@ -113,7 +139,7 @@ def main():
                             valid_moves = []
 
                         for move in valid_moves:
-                            if (row, column) == (7 - move.target_position.rank, move.target_position.file):
+                            if (7 - row, column) == target_for_move(move):
                                 print(f"applying move {move}")
                                 engine.apply_move(move)
 
