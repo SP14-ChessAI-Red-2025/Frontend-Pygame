@@ -88,6 +88,8 @@ def main():
         print("Must pass library path on command line")
         return
 
+    ai_enabled = False
+
     # initializes pygame
     pygame.init()
 
@@ -108,6 +110,8 @@ def main():
     #loads images
     load_images()
 
+    ai_turn = False
+
     with chess.ChessEngine(argv[1]) as engine:
         board_state = engine.board_state
 
@@ -115,6 +119,14 @@ def main():
 
         #render/input loop
         while True:
+            if ai_turn:
+                ai_turn = False
+
+                print("making ai move")
+                engine.ai_move(2)
+
+                continue
+
             for event in pygame.event.get():
                 # allow to user to quit
                 if event.type == pygame.QUIT:
@@ -155,13 +167,17 @@ def main():
                             valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
                     else:
                         SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
-                        valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)                    
+                        valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
+
+                    if made_move:
+                        ai_turn = ai_enabled
 
             #draw board & pieces
             draw_board(screen)
             draw_pcs(screen, board_state.pieces, valid_moves)
 
             pygame.display.update()
+
 
 #calls main method
 if __name__ == '__main__':
