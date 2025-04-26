@@ -90,6 +90,9 @@ def main():
 
     ai_enabled = False
 
+    if len(argv) > 2 and argv[2] in ["True", "true"]:
+        ai_enabled = True
+
     # initializes pygame
     pygame.init()
 
@@ -110,9 +113,9 @@ def main():
     #loads images
     load_images()
 
-    ai_turn = False
+    ai_turn = True
 
-    with chess.ChessEngine(argv[1]) as engine:
+    with chess.ChessEngine(argv[1], "/Users/alec/code/chess_project1/chess_cpp/model/nnue_model.onnx") as engine:
         board_state = engine.board_state
 
         valid_moves = []
@@ -123,7 +126,7 @@ def main():
                 ai_turn = False
 
                 print("making ai move")
-                engine.ai_move(2)
+                engine.ai_move(4)
 
                 continue
 
