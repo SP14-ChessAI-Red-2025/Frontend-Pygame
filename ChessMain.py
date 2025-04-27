@@ -44,8 +44,6 @@ def target_for_move(move):
             return (move.start_position.rank, 2)
         else:
             return (move.start_position.rank, 6)
-        return None
-        raise Exception("Not implemented yet")
 
     return (move.target_position.rank, move.target_position.file)
 
