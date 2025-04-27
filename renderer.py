@@ -6,8 +6,10 @@ class Renderer:
         # defines screen size, board size, square size, and piece icon array
         self.BOARD_SIZE = 8
         self.icons = []
-        self.SQ_SIZE = screen.get_width() / self.BOARD_SIZE
+        self.SQ_SIZE = screen.get_height() / self.BOARD_SIZE
         self.screen = screen
+
+        self.sidebar_width = screen.get_width() - screen.get_height()
 
         # sets window caption and icon
         pygame.display.set_caption("ChessAI")
@@ -17,7 +19,7 @@ class Renderer:
         #loads images
         self.load_images()
 
-        self.font = pygame.font.SysFont(None, 240)
+        self.font = pygame.font.SysFont(None, 48)
 
     #loads images
     def load_images(self):
@@ -63,14 +65,18 @@ class Renderer:
                     else:
                         self.screen.blit(icon, pygame.Rect(pygame.mouse.get_pos()[0] - (SQ_SIZE / 2), pygame.mouse.get_pos()[1] - (SQ_SIZE / 2), SQ_SIZE, SQ_SIZE))
 
-    def draw_status(self):
-        img = self.font.render('hello', True, (0, 0, 255))
-        self.screen.blit(img, (20, 20))
+    def draw_status(self, board_state):
+        status_str = ["Normal", "Draw", "Checkmate", "Resigned"][board_state.status]
+        img = self.font.render(f"Status: {status_str}", True, (0, 0, 255))
+        self.screen.blit(img, (self.screen.get_height() + 10, 20))
 
     def render(self, board_state, move_targets, SELECTED_PIECE):
         #draw board & pieces
         self.draw_board()
         self.draw_pcs(board_state.pieces, move_targets, SELECTED_PIECE)
 
-    def render_menu(self):
-        self.draw_status()
+        rect = pygame.Rect(self.screen.get_height(), 0, self.sidebar_width, self.screen.get_height())
+        pygame.draw.rect(self.screen, pygame.Color("orange"), rect)
+
+        self.draw_status(board_state)
+        

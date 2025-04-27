@@ -130,9 +130,11 @@ def main():
     # initializes pygame
     pygame.init()
 
+
     # calculates window size and square size
     monitor_info = pygame.display.Info()
-    screen_width = screen_height = monitor_info.current_h / 1.25
+    screen_width = monitor_info.current_h * 1.25
+    screen_height = monitor_info.current_h / 1.25
 
     # sets window size
     screen = pygame.display.set_mode((screen_width, screen_height))
