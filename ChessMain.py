@@ -69,10 +69,10 @@ class InputHandler():
                     break
 
             if not self.made_move and self.SELECTED_PIECE != ("", 0, 0):
-                self.SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
+                self.SELECTED_PIECE = (board_state.pieces[7 - row][column].piece_type, row, column)
                 self.valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
         else:
-            self.SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
+            self.SELECTED_PIECE = (board_state.pieces[7 - row][column].piece_type, row, column)
             self.valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
 
     def handle_event(self, event, engine):

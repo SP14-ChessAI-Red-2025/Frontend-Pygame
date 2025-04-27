@@ -50,7 +50,7 @@ class Renderer:
             for column in range(self.BOARD_SIZE):
                 pc = game_board[7 - row][column]
                 
-                pcCoords = (pc, row, column)
+                pcCoords = (pc.piece_type, row, column)
 
                 if (7 - row, column) in move_targets:
                     pygame.draw.circle(self.screen, pygame.Color("black"), center = (column * SQ_SIZE + SQ_SIZE / 2, row * SQ_SIZE + SQ_SIZE / 2), radius = SQ_SIZE / 2, width = 2)
