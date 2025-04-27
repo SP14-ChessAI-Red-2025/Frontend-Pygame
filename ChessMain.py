@@ -6,9 +6,6 @@ import chess
 import render
 
 
-SELECTED_PIECE = ("", 0, 0)
-
-
 # Given a chess move, return the square that must be clicked to apply the move
 # For most moves, this is just move.target_position, but castling needs special handling
 def target_for_move(move):
@@ -49,7 +46,7 @@ def main():
 
     ai_player = "black"
 
-    if len(argv) > 4 and argv[4] in ["white", "White", "black", "Black"]:
+    if len(argv) > 4 and argv[4] in ["white", "White", "black", "Black", "both", "Both"]:
         ai_player = argv[4].lower()
 
     # initializes pygame
@@ -57,7 +54,9 @@ def main():
 
     renderer = render.Renderer()
 
-    ai_turn = ai_enabled and ai_player == "white"
+    ai_turn = ai_enabled and (ai_player == "white" or ai_player == "both")
+
+    SELECTED_PIECE = ("", 0, 0)
 
     with chess.ChessEngine(argv[1], argv[2]) as engine:
         board_state = engine.board_state
@@ -66,30 +65,38 @@ def main():
 
         #render/input loop
         while True:
+            move_targets = [target_for_move(move) for move in valid_moves]
+            renderer.render(board_state, move_targets, SELECTED_PIECE)
+
+            pygame.display.update()
+
+            made_move = False
+
             if ai_turn:
-                ai_turn = False
+                ai_turn = ai_player == "both"
 
                 print("making ai move")
                 engine.ai_move(4)
 
-                continue
+                print("made ai move")
+
+                made_move = True
 
             for event in pygame.event.get():
                 # allow to user to quit
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-                
                 elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # Ignore the click if the AI has already made a move
+                    if made_move:
+                        continue
+
                     position = pygame.mouse.get_pos()
                     column = (int)(position[0] / renderer.SQ_SIZE)
                     row = (int)(position [1] / renderer.SQ_SIZE)
 
-                    global SELECTED_PIECE
-
                     print(f"clicked row: {row}, column: {column}")
-
-                    made_move = False
  
                     if SELECTED_PIECE[0] != "":
                         if (SELECTED_PIECE[1], SELECTED_PIECE[2]) == (row, column):
@@ -118,11 +125,6 @@ def main():
 
                     if made_move:
                         ai_turn = ai_enabled
-
-            move_targets = [target_for_move(move) for move in valid_moves]
-            renderer.render(board_state, move_targets, SELECTED_PIECE)
-
-            pygame.display.update()
 
 
 #calls main method
