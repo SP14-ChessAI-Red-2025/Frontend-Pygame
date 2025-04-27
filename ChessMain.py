@@ -84,13 +84,13 @@ def moves_for_position(valid_moves, rank, file):
 
 #initializes application window/provides game loop
 def main():
-    if len(argv) < 2:
-        print("Must pass library path on command line")
+    if len(argv) < 3:
+        print("Must pass library path and model path on command line")
         return
 
     ai_enabled = False
 
-    if len(argv) > 2 and argv[2] in ["True", "true"]:
+    if len(argv) > 3 and argv[3] in ["True", "true"]:
         ai_enabled = True
 
     # initializes pygame
@@ -115,7 +115,7 @@ def main():
 
     ai_turn = True
 
-    with chess.ChessEngine(argv[1], "/Users/alec/code/chess_project1/chess_cpp/model/nnue_model.onnx") as engine:
+    with chess.ChessEngine(argv[1], argv[2]) as engine:
         board_state = engine.board_state
 
         valid_moves = []
