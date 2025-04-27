@@ -47,12 +47,17 @@ def main():
     if len(argv) > 3 and argv[3] in ["True", "true"]:
         ai_enabled = True
 
+    ai_player = "black"
+
+    if len(argv) > 4 and argv[4] in ["white", "White", "black", "Black"]:
+        ai_player = argv[4].lower()
+
     # initializes pygame
     pygame.init()
 
     renderer = render.Renderer()
 
-    ai_turn = True
+    ai_turn = ai_enabled and ai_player == "white"
 
     with chess.ChessEngine(argv[1], argv[2]) as engine:
         board_state = engine.board_state
