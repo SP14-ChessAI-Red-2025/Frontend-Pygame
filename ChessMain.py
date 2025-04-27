@@ -3,8 +3,8 @@ from sys import exit, argv
 from pygame import Color
 
 import chess
-import render
-from start_menu import *
+import renderer
+import menu
 
 
 # Given a chess move, return the square that must be clicked to apply the move
@@ -137,7 +137,7 @@ def main():
     # sets window size
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    input_handler = MenuInputHandler(screen)
+    input_handler = menu.MenuInputHandler(screen)
 
     with chess.ChessEngine(argv[1], argv[2]) as engine:
         # render/input loop
@@ -150,7 +150,7 @@ def main():
                 print(f"ai_player: {ai_player}")
 
                 # User has chosen a game mode, so replace the input handler with the main one
-                input_handler = InputHandler(render.Renderer(screen), ai_player != "none", ai_player)
+                input_handler = InputHandler(renderer.Renderer(screen), ai_player != "none", ai_player)
 
 
 #calls main method
