@@ -81,8 +81,8 @@ class InputHandler():
             pygame.quit()
             exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            # Ignore the click if the AI has already made a move
-            if self.made_move:
+            # Ignore the click if the AI has already made a move or if the game is over
+            if self.made_move or engine.board_state.status != 0:
                 return
 
             position = pygame.mouse.get_pos()
@@ -105,7 +105,7 @@ class InputHandler():
 
         self.made_move = False
 
-        if self.ai_turn:
+        if self.ai_turn and engine.board_state.status != 0:
             self.ai_turn = self.ai_player == "both"
 
             print("making ai move")
