@@ -2,19 +2,12 @@ import pygame
 from pygame import Color
 
 class Renderer:
-    def __init__(self):
+    def __init__(self, screen):
         # defines screen size, board size, square size, and piece icon array
         self.BOARD_SIZE = 8
         self.icons = []
-
-        #calculates window size and square size
-        monitorInfo = pygame.display.Info()
-        screenWidth = screenHeight = monitorInfo.current_h / 1.25
-        
-        self.SQ_SIZE = screenWidth / self.BOARD_SIZE
-
-        #sets window size
-        self.screen = pygame.display.set_mode((screenWidth, screenHeight))
+        self.SQ_SIZE = screen.get_width() / self.BOARD_SIZE
+        self.screen = screen
 
         # sets window caption and icon
         pygame.display.set_caption("ChessAI")
@@ -23,6 +16,8 @@ class Renderer:
 
         #loads images
         self.load_images()
+
+        self.font = pygame.font.SysFont(None, 240)
 
     #loads images
     def load_images(self):
@@ -68,7 +63,14 @@ class Renderer:
                     else:
                         self.screen.blit(icon, pygame.Rect(pygame.mouse.get_pos()[0] - (SQ_SIZE / 2), pygame.mouse.get_pos()[1] - (SQ_SIZE / 2), SQ_SIZE, SQ_SIZE))
 
+    def draw_status(self):
+        img = self.font.render('hello', True, (0, 0, 255))
+        self.screen.blit(img, (20, 20))
+
     def render(self, board_state, move_targets, SELECTED_PIECE):
         #draw board & pieces
         self.draw_board()
         self.draw_pcs(board_state.pieces, move_targets, SELECTED_PIECE)
+
+    def render_menu(self):
+        self.draw_status()

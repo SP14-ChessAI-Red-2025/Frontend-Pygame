@@ -4,6 +4,7 @@ from pygame import Color
 
 import chess
 import render
+from start_menu import *
 
 
 # Given a chess move, return the square that must be clicked to apply the move
@@ -108,6 +109,7 @@ class InputHandler():
             self.ai_turn = self.ai_player == "both"
 
             print("making ai move")
+
             engine.ai_move(4)
 
             print("made ai move")
@@ -125,20 +127,30 @@ def main():
         print("Must pass library path and model path on command line")
         return
 
-    ai_player = "none"
-
-    if len(argv) > 3 and argv[3].lower() in ["white", "black", "both", "none"]:
-        ai_player = argv[3].lower()
-
     # initializes pygame
     pygame.init()
 
-    input_handler = InputHandler(render.Renderer(), ai_player != "none", ai_player)
+    # calculates window size and square size
+    monitor_info = pygame.display.Info()
+    screen_width = screen_height = monitor_info.current_h / 1.25
+
+    # sets window size
+    screen = pygame.display.set_mode((screen_width, screen_height))
+
+    input_handler = MenuInputHandler(screen)
 
     with chess.ChessEngine(argv[1], argv[2]) as engine:
-        #render/input loop
+        # render/input loop
         while True:
-            input_handler.main_loop_iter(engine)
+            # The menu input handler will return None until the user selects an option
+            # After that, it will return the game settings
+            ai_player = input_handler.main_loop_iter(engine)
+
+            if ai_player is not None:
+                print(f"ai_player: {ai_player}")
+
+                # User has chosen a game mode, so replace the input handler with the main one
+                input_handler = InputHandler(render.Renderer(screen), ai_player != "none", ai_player)
 
 
 #calls main method
