@@ -33,98 +33,112 @@ def moves_for_position(valid_moves, rank, file):
 
     return moves
 
+
+class InputHandler():
+    def __init__(self, renderer, ai_enabled, ai_player):
+        self.SELECTED_PIECE = ("", 0, 0)
+        self.valid_moves = []
+        self.made_move = False
+
+        self.renderer = renderer
+
+        self.ai_enabled = ai_enabled
+        self.ai_player = ai_player
+        self.ai_turn = ai_enabled and (ai_player == "white" or ai_player == "both")
+
+    def handle_click(self, engine, row, column):
+        board_state = engine.board_state
+
+        if self.SELECTED_PIECE[0] != "":
+            if (self.SELECTED_PIECE[1], self.SELECTED_PIECE[2]) == (row, column):
+                # Deselect the current piece if the player clicks it again
+                self.SELECTED_PIECE = ("", 0, 0)
+                self.valid_moves = []
+
+            for move in self.valid_moves:
+                if (7 - row, column) == target_for_move(move):
+                    print(f"applying move {move}")
+                    engine.apply_move(move)
+
+                    self.SELECTED_PIECE = ("", 0, 0)
+                    self.valid_moves = []
+
+                    self.made_move = True
+
+                    break
+
+            if not self.made_move and self.SELECTED_PIECE != ("", 0, 0):
+                self.SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
+                self.valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
+        else:
+            self.SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
+            self.valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
+
+    def handle_event(self, event, engine):
+        # allow to user to quit
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            # Ignore the click if the AI has already made a move
+            if self.made_move:
+                return
+
+            position = pygame.mouse.get_pos()
+            column = int(position[0] / self.renderer.SQ_SIZE)
+            row = int(position[1] / self.renderer.SQ_SIZE)
+            
+            print(f"clicked row: {row}, column: {column}")
+
+            self.handle_click(engine, row, column)
+
+            if self.made_move:
+                self.ai_turn = self.ai_enabled
+
+    def main_loop_iter(self, engine):
+        move_targets = [target_for_move(move) for move in self.valid_moves]
+                
+        self.renderer.render(engine.board_state, move_targets, self.SELECTED_PIECE)
+
+        pygame.display.update()
+
+        self.made_move = False
+
+        if self.ai_turn:
+            self.ai_turn = self.ai_player == "both"
+
+            print("making ai move")
+            engine.ai_move(4)
+
+            print("made ai move")
+
+            self.made_move = True
+
+        for event in pygame.event.get():
+            self.handle_event(event, engine)
+                
+
+
 #initializes application window/provides game loop
 def main():
     if len(argv) < 3:
         print("Must pass library path and model path on command line")
         return
 
-    ai_enabled = False
+    ai_player = "none"
 
-    if len(argv) > 3 and argv[3] in ["True", "true"]:
-        ai_enabled = True
-
-    ai_player = "black"
-
-    if len(argv) > 4 and argv[4] in ["white", "White", "black", "Black", "both", "Both"]:
-        ai_player = argv[4].lower()
+    if len(argv) > 3 and argv[3].lower() in ["white", "black", "both", "none"]:
+        ai_player = argv[3].lower()
 
     # initializes pygame
     pygame.init()
 
-    renderer = render.Renderer()
-
-    ai_turn = ai_enabled and (ai_player == "white" or ai_player == "both")
-
-    SELECTED_PIECE = ("", 0, 0)
+    input_handler = InputHandler(render.Renderer(), ai_player != "none", ai_player)
 
     with chess.ChessEngine(argv[1], argv[2]) as engine:
-        board_state = engine.board_state
-
-        valid_moves = []
-
         #render/input loop
         while True:
-            move_targets = [target_for_move(move) for move in valid_moves]
-            renderer.render(board_state, move_targets, SELECTED_PIECE)
-
-            pygame.display.update()
-
-            made_move = False
-
-            if ai_turn:
-                ai_turn = ai_player == "both"
-
-                print("making ai move")
-                engine.ai_move(4)
-
-                print("made ai move")
-
-                made_move = True
-
-            for event in pygame.event.get():
-                # allow to user to quit
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    # Ignore the click if the AI has already made a move
-                    if made_move:
-                        continue
-
-                    position = pygame.mouse.get_pos()
-                    column = (int)(position[0] / renderer.SQ_SIZE)
-                    row = (int)(position [1] / renderer.SQ_SIZE)
-
-                    print(f"clicked row: {row}, column: {column}")
- 
-                    if SELECTED_PIECE[0] != "":
-                        if (SELECTED_PIECE[1], SELECTED_PIECE[2]) == (row, column):
-                            # Deselect the current piece if the player clicks it again
-                            SELECTED_PIECE = ("", 0, 0)
-                            valid_moves = []
-
-                        for move in valid_moves:
-                            if (7 - row, column) == target_for_move(move):
-                                print(f"applying move {move}")
-                                engine.apply_move(move)
-
-                                SELECTED_PIECE = ("", 0, 0)
-                                valid_moves = []
-
-                                made_move = True
-
-                                break
-
-                        if not made_move and SELECTED_PIECE != ("", 0, 0):
-                            SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
-                            valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
-                    else:
-                        SELECTED_PIECE = (board_state.pieces[7 - row][column], row, column)
-                        valid_moves = moves_for_position(engine.get_valid_moves(), 7 - row, column)
-
-                    if made_move:
-                        ai_turn = ai_enabled
+            input_handler.main_loop_iter(engine)
 
 
 #calls main method
