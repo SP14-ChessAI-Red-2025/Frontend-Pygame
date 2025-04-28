@@ -79,8 +79,14 @@ class Renderer:
     def draw_status(self, board_state):
         status_str = ["Normal", "Draw", "Checkmate", "Resigned"][board_state.status]
         img = self.font.render(f"STATUS: {status_str}", True, pygame.Color("antiquewhite"))
-        #self.screen.blit(img, (self.screen.get_height() + 10, 20))
+
         self.screen.blit(img, (((self.screen.get_width() - self.sidebar_width) + (self.sidebar_width / 2)) - (img.get_width() / 2), 20))
+
+        if board_state.status in [2, 3]:
+            winner = "Black" if board_state.current_player == 0 else "White"
+            img = self.font.render(f"Winner: {winner}", True, pygame.Color("antiquewhite"))
+
+            self.screen.blit(img, (((self.screen.get_width() - self.sidebar_width) + (self.sidebar_width / 2)) - (img.get_width() / 2), 60))
 
     def render(self, board_state, move_targets, SELECTED_PIECE):
         #draw board & pieces
