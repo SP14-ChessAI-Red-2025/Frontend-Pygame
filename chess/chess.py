@@ -72,6 +72,11 @@ class BoardState:
         """Get the current game status (0: normal, 1: draw, 2: checkmate, 3: resigned)."""
         return self.board_state_impl.status
 
+    @status.setter
+    def status(self, value: int) -> None:
+        """Set the current game status."""
+        self.board_state_impl.status = value
+
     @property
     def current_player(self) -> int:
         """Get the current player (0: white, 1: black)."""

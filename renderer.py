@@ -19,7 +19,18 @@ class Renderer:
         #loads images
         self.load_images()
 
-        self.font = pygame.font.SysFont(None, 48)
+        #loads side bar image
+        self.sideBarImage = pygame.transform.scale(pygame.image.load("images/side_bar.png"), (self.sidebar_width, screen.get_height()))
+
+        #loads button images
+        self.drawButton = pygame.transform.scale(pygame.image.load("images/draw_btn.png"), (300, 100))
+        self.resignButton = pygame.transform.scale(pygame.image.load("images/resign_btn.png"), (375, 100))
+
+        #creates rect for buttons
+        self.drawBtnRect = pygame.Rect(((self.screen.get_width()) - (self.sidebar_width / 2)) - (self.drawButton.get_width() / 2), (self.screen.get_height() / 3), 300, 100)
+        self.resignBtnRect = pygame.Rect(((self.screen.get_width()) - (self.sidebar_width / 2)) - (self.resignButton.get_width() / 2), (self.screen.get_height() / 2), 375, 100)
+
+        self.font = pygame.font.SysFont("Courier New", 36, True)
 
     #loads images
     def load_images(self):
@@ -67,16 +78,23 @@ class Renderer:
 
     def draw_status(self, board_state):
         status_str = ["Normal", "Draw", "Checkmate", "Resigned"][board_state.status]
-        img = self.font.render(f"Status: {status_str}", True, (0, 0, 255))
-        self.screen.blit(img, (self.screen.get_height() + 10, 20))
+        img = self.font.render(f"STATUS: {status_str}", True, pygame.Color("antiquewhite"))
+        #self.screen.blit(img, (self.screen.get_height() + 10, 20))
+        self.screen.blit(img, (((self.screen.get_width() - self.sidebar_width) + (self.sidebar_width / 2)) - (img.get_width() / 2), 20))
 
     def render(self, board_state, move_targets, SELECTED_PIECE):
         #draw board & pieces
         self.draw_board()
         self.draw_pcs(board_state.pieces, move_targets, SELECTED_PIECE)
 
+        #draw sidebar
         rect = pygame.Rect(self.screen.get_height(), 0, self.sidebar_width, self.screen.get_height())
-        pygame.draw.rect(self.screen, pygame.Color("orange"), rect)
+        self.screen.blit(self.sideBarImage, rect)
+        #pygame.draw.rect(self.screen, pygame.Color("darkslategray"), rect)
+
+        #draw buttons
+        self.screen.blit(self.drawButton, self.drawBtnRect)
+        self.screen.blit(self.resignButton, self.resignBtnRect)
 
         self.draw_status(board_state)
         
