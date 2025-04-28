@@ -54,11 +54,6 @@ class MenuInputHandler:
 
 
     def render_menu(self):
-        #for rect, _, text in self.buttons:
-            #pygame.draw.rect(self.screen, pygame.Color("darkblue"), rect)
-
-            #img = self.font.render(text, True, pygame.Color("white"))
-
         #draws background
         rect = pygame.Rect(0, 0, self.screenWidth, self.screenHeight)
         pygame.draw.rect(self.screen, pygame.Color("lightseagreen"), rect)
@@ -73,6 +68,10 @@ class MenuInputHandler:
         self.screen.blit(self.button_images[2], self.buttons[2][0])
         self.screen.blit(self.button_images[3], self.buttons[3][0])
 
+    # This method serves two function
+    # It normally performs an iteration of the main loop for the main menu, and returns None
+    # When the player selects an option, it returns ai_player
+    # A non-None return value tells the main loop to switch to the main InputHandler cladd
     def main_loop_iter(self, engine):
         if self.clicked:
             return self.ai_player

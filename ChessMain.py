@@ -90,7 +90,9 @@ class InputHandler():
 
             position = pygame.mouse.get_pos()
 
-            #changes game status is draw or resign button is pressed
+            # Changes game status if draw or resign button is pressed
+            # Normally, changing the game status directly without going through apply_move
+            # is not allowed.  In this case, however, the game immediately ends, so it is ok
             if position[0] > self.renderer.screen.get_width() - self.renderer.sidebar_width:
                 if self.renderer.drawBtnRect.collidepoint(position) and engine.board_state.can_claim_draw:
                     engine.board_state.status = 1

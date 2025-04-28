@@ -55,7 +55,7 @@ class Renderer:
         else:
             return self.icons[6 + piece_type - 1]
 
-    #draws pieces over game board
+    # Draws pieces over game board, as well as circles indicating the possible move targets
     def draw_pcs(self, game_board, move_targets, SELECTED_PIECE):
         SQ_SIZE = self.SQ_SIZE
         
@@ -76,6 +76,8 @@ class Renderer:
                     else:
                         self.screen.blit(icon, pygame.Rect(pygame.mouse.get_pos()[0] - (SQ_SIZE / 2), pygame.mouse.get_pos()[1] - (SQ_SIZE / 2), SQ_SIZE, SQ_SIZE))
 
+    # Draws the status display
+    # This includes the current game status, as well as the winner if the game is over
     def draw_status(self, board_state):
         status_str = ["Normal", "Draw", "Checkmate", "Resigned"][board_state.status]
         img = self.font.render(f"STATUS: {status_str}", True, pygame.Color("antiquewhite"))
