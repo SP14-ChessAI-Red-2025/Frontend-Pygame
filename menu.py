@@ -31,9 +31,9 @@ class MenuInputHandler:
         #array of rects for buttons
         self.buttons = [
             (pygame.Rect((self.screen.get_width() / 2) - (self.button_images[0].get_width() / 2), self.screenHeight / 2.5, 800, 100), "none", "Player vs. Player"),
-            (pygame.Rect((self.screen.get_width() / 2) - (self.button_images[1].get_width() / 2), (self.screenHeight / 2.5) + 125, 900, 100), "black", "Play as white vs. AI"),
-            (pygame.Rect((self.screen.get_width() / 2) - (self.button_images[2].get_width() / 2), (self.screenHeight / 2.5) + 250, 900, 100), "white", "Play as black vs. AI"),
-            (pygame.Rect((self.screen.get_width() / 2) - (self.button_images[3].get_width() / 2), (self.screenHeight / 2.5) + 375, 500, 100), "both", "Watch the AI play itself")
+            (pygame.Rect((self.screen.get_width() / 2) - (self.button_images[1].get_width() / 2), (self.screenHeight / 2.5) + 110, 900, 100), "black", "Play as white vs. AI"),
+            (pygame.Rect((self.screen.get_width() / 2) - (self.button_images[2].get_width() / 2), (self.screenHeight / 2.5) + 220, 900, 100), "white", "Play as black vs. AI"),
+            (pygame.Rect((self.screen.get_width() / 2) - (self.button_images[3].get_width() / 2), (self.screenHeight / 2.5) + 330, 500, 100), "both", "Watch the AI play itself")
         ]
 
         self.clicked = False
