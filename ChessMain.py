@@ -105,7 +105,7 @@ class InputHandler():
 
         self.made_move = False
 
-        if self.ai_turn and engine.board_state.status != 0:
+        if self.ai_turn and engine.board_state.status == 0:
             self.ai_turn = self.ai_player == "both"
 
             print("making ai move")
