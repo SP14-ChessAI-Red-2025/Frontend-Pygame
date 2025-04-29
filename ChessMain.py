@@ -37,7 +37,7 @@ def moves_for_position(valid_moves, rank, file):
 
 
 class InputHandler():
-    def __init__(self, screen, renderer, ai_enabled, ai_player):
+    def __init__(self, screen, renderer, ai_enabled, ai_player, difficulty):
         self.SELECTED_PIECE = ("", 0, 0)
         self.valid_moves = []
         self.made_move = False
@@ -49,6 +49,8 @@ class InputHandler():
         self.ai_enabled = ai_enabled
         self.ai_player = ai_player
         self.ai_turn = ai_enabled and (ai_player == "white" or ai_player == "both")
+
+        self.difficulty = difficulty
 
     def handle_click(self, engine, row, column):
         board_state = engine.board_state
@@ -127,7 +129,7 @@ class InputHandler():
 
             print("making ai move")
 
-            engine.ai_move(4)
+            engine.ai_move(self.difficulty)
 
             print("made ai move")
 
@@ -142,6 +144,12 @@ def main():
     if len(argv) < 3:
         print("Must pass library path and model path on command line")
         return
+
+    difficulty = 4
+
+    if len(argv) > 3:
+        difficulty = int(argv[3])
+        print(f"Using a difficulty of {difficulty}")
 
     # initializes pygame
     pygame.init()
@@ -167,7 +175,7 @@ def main():
                 print(f"ai_player: {ai_player}")
 
                 # User has chosen a game mode, so replace the input handler with the main one
-                input_handler = InputHandler(screen, renderer.Renderer(screen), ai_player != "none", ai_player)
+                input_handler = InputHandler(screen, renderer.Renderer(screen), ai_player != "none", ai_player, difficulty)
 
 
 # calls main method
